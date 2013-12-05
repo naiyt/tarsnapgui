@@ -76,7 +76,22 @@ class TarSnap(TarBase):
 
 class Archive(TarBase):
     """ Archives, that can be deleted, viewed, created, etc. """
-    def __init__(self):
+    def __init__(self, name):
+        self.name = name
+
+    def delete(self):
+        command = config.tarsnap_executable + " -d -f " + self.name
+        result = self._execute(command)
+        # TODO - Error checking
+        if result:
+            return True
+        else:
+            return False
+
+    def restore(self, to_loc, files):
+        pass
+
+    def stats_for(self):
         pass
 
 
