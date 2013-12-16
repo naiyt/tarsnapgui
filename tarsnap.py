@@ -21,7 +21,7 @@ class TarBase():
         and for error handling/timeouts from TarSnap
         """
 
-        return check_output(command, shell=True) # TODO - Error handling here, timeouts, exceptions
+        return check_output(command) # TODO - Error handling here, timeouts, exceptions
 
 
 class TarSnap(TarBase):
@@ -61,13 +61,12 @@ class TarSnap(TarBase):
             return self._create(**kwargs)
 
     def _list(self):
-        command = config.tarsnap_executable + " --list-archives"
-        return self._execute(command)
+        return self._execute([config.tarsnap_executable, '--list-archives'])
 
     def _stats(self, **kwargs):
-        command = config.tarsnap_executable + " --print-stats"
+        command = [config.tarsnap_executable, "--print-stats"]
         if 'archive' in kwargs:
-            command = config.tarsnap_executable + " --print-stats -f " + kwargs['archive']
+            command = [config.tarsnap_executable, '--print-stats', '-f', kwargs['archive']]
         return self._execute(command)
 
     def _create(self, **kwargs):
@@ -80,7 +79,7 @@ class Archive(TarBase):
         self.name = name
 
     def delete(self):
-        command = config.tarsnap_executable + " -d -f " + self.name
+        command = [config.tarsnap_executable, '-d', '-f', self.name]
         result = self._execute(command)
         # TODO - Error checking
         if result:
@@ -91,8 +90,21 @@ class Archive(TarBase):
     def restore(self, to_loc, files):
         pass
 
-    def stats_for(self):
-        pass
+    def stats(self):
+        command = [config.tarsnap_executable, '--print-stats', '-f', self.name]
+        result = self._execute(command)
+        if result:
+            return True
+        else:
+            return False
+
+    def list_files(self):
+        command = [config.tarsnap_executable, '-tv', '-f', self.name]
+        result = self._execute(command)
+        if result:
+            return True
+        else:
+            return False
 
 
 class Stats(TarBase):
